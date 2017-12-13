@@ -5,6 +5,7 @@ Vocabulary magoosh knock-off
 Author: Alex Larsen
 
 """
+
 import csv
 import tkinter as tk
 
@@ -34,7 +35,7 @@ class Window(tk.Frame):
 
 class Level(object):
     def __init__(self,file):
-        self.file
+        self.file = file
         self.terms = []
         self.newword1 = 0
         self.done = [0]
@@ -55,7 +56,17 @@ class Level(object):
             term.mock1 = learn[2]
             term.mock2 = learn[3]
             term.mock3 = learn[4]
-            terms.append(term)
+            self.terms.append(term)
+            
+    def clear():
+            for clrd in app.grid_slaves():
+                try:
+                    clrd.grid_forget()
+                except NameError:
+                    continue
+            
+    def test(self):
+        
             
 class Term(object):
     def __init__(self):
@@ -68,11 +79,6 @@ class Term(object):
 
         
 root = tk.Tk()
-
 root.geometry("379x220")
-
 app = Window(root)
-
-
-
 root.mainloop()   
