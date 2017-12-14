@@ -56,7 +56,7 @@ class Window(Frame):
     def init_window(self):
 
         self.master.title("Vocabulary")
-
+ 
         self.grid()
 
         menu = Menu(self.master)
