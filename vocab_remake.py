@@ -28,6 +28,10 @@ class Window(tk.Frame):
         file.add_command(label = 'Exit', command=self.client_exit)
         menu.add_cascade(label= 'File', menu=file)
         normal = tk.Menu(menu)
+        normal.add_command(label = 'Level 1',command= lambda: self.initialize
+                          ("lvl1normal.csv"))
+        normal.add_command(label = 'level 2',command= lambda: self.initialize
+                          ("lvl2normal.csv"))
         menu.add_cascade(label= 'Normal', menu= normal)
         hard = tk.Menu(menu)
         hard.add_command(label = 'Level 1',command= lambda: self.initialize
@@ -47,40 +51,59 @@ class Window(tk.Frame):
         lvl.insert()
         self.test(lvl)
         
+    def buttonmake(self, txt, backgrnd, com_option):
+        if com_option != None:
+            return tk.Button(self,text=txt,width=30,font =('bold', 15),
+                             background=backgrnd,command= lambda: self.learned
+                             (com_option))
+        elif com_option == None:
+            return tk.Button(self,text=txt,width=35,font =('bold', 15),
+                             background=backgrnd)
+        
     def populate(self):
         lvl = self.lvl
         lvl.clear('all')
-        word = tk.Button(self, text=lvl.get_word('word'), width = 35, font =
-                         ('bold', 15), background = "lightcyan")
+        word = self.buttonmake(lvl.get_word('word'),"lightcyan",None)
+        #tk.Button(self, text=lvl.get_word('word'), width = 35, font =
+        #('bold', 15), background = "lightcyan")
         word.grid()
-        definition = tk.Button(self,text=lvl.get_word('definition'),width = 30,
-                               font =('serif', 15),command= lambda: 
-                                   self.learned(True))
-        mock1 = tk.Button(self,text=lvl.get_word('mock1'),width = 30, font =
-                          ('serif', 15), command=lambda: self.learned(False))
-        mock2 = tk.Button(self,text=lvl.get_word('mock2'),width = 30, font =
-                          ('serif', 15), command=lambda: self.learned(False))
-        mock3 = tk.Button(self,text=lvl.get_word('mock3'),width = 30, font =
-                          ('serif', 15), command=lambda: self.learned(False))
+        definition = self.buttonmake(lvl.get_word('definition'),None, True)
+        mock1 = self.buttonmake(lvl.get_word('mock1'),None, False)
+        mock2 = self.buttonmake(lvl.get_word('mock2'),None, False)
+        mock3 = self.buttonmake(lvl.get_word('mock3'),None, False)
         randbutton = [definition, mock1, mock2, mock3]
         randbutton = random.sample(randbutton, 4)
         for butn in randbutton:
             butn.grid()
     
-        notsure = tk.Button(self,text='Not Sure',width = 30, font =
-                            ('serif', 15), command=lambda: self.learned(False))
+        notsure = self.buttonmake(lvl.get_word('Not sure'),None, False)
         notsure.grid()
         self.counter()
         
     def counter(self):
         lvl = self.lvl
         complete = tk.Text(self, width=6, height = 1, font= "Helvetica 20")
-        complete.tag_configure("right", justify="center")
-        complete.grid(row = 7)
+        complete.tag_configure("center", justify="center")
+        complete.grid(row = 8)
         complete_text = str(len(lvl.done))+str("/"+str(lvl.leng))
-        complete.insert(END, complete_text, "right")
+        complete.insert(END, complete_text, "center")
         complete.config(state=DISABLED)
-        #num_done.config(num_text,justify="right")
+        self.state()
+        
+    def state(self):
+        lvl = self.lvl
+        if lvl.newword in lvl.failed:
+            tk.Label(self,text= "Working on it", height = 1,
+                     font="Helvetica 15",background='pink').grid(row=7)
+        elif lvl.newword in (lvl.review or lvl.review2):
+            tk.Label(self,text= "Reviewing", height = 1,
+                     font="Helvetica 15",background='lightyellow').grid(row=7)
+        elif lvl.newword in lvl.done:
+            tk.Label(self,text= "Learned!", height = 1,
+                     font="Helvetica 15",background='lightgreen').grid(row=7)
+        else:
+            tk.Label(self,text= "New Word", height = 1,
+                     font="Helvetica 15",background='gray').grid(row=7)
         
     def learned(self, option):
         lvl = self.lvl
@@ -90,8 +113,7 @@ class Window(tk.Frame):
         review2 = lvl.review
         failed = lvl.failed
         if option == True:
-            revdef = tk.Button(self,text=lvl.get_word('definition'),width = 30,
-                               font =('serif', 15), background = "lightgreen")
+            revdef=self.buttonmake(lvl.get_word('definition'),'lightgreen',True)
             revdef.grid()
             if newword in failed:
                 lvl.failed.remove(newword)
@@ -107,8 +129,7 @@ class Window(tk.Frame):
                 lvl.done.append(newword)
                 lvl.terms.remove(newword)
         if option == False:
-            revdef = tk.Button(self,text=lvl.get_word('definition'),width = 30,
-                               font =('serif', 15), background = "pink")
+            revdef = self.buttonmake(lvl.get_word('definition'),'pink',True)
             revdef.grid()
             lvl.failed.append(newword)
             if newword in review:
@@ -119,9 +140,13 @@ class Window(tk.Frame):
             continu = tk.Button(self, text = "Continue", width = 30, font =
                                 ('bold', 15),command=lambda: self.populate())
             continu.grid()
-            lvl.newword = random.SystemRandom().choice(lvl.terms)
             tk.Label(self, height = 9).grid()
             self.counter()
+            lvl.newword = random.SystemRandom().choice(lvl.terms)
+            
+            
+        else:
+            tk.Label(self,text= "well done", height = 9).grid()
             
     def test(self, lvl):
         lvl.newword = random.SystemRandom().choice(lvl.terms)
@@ -186,10 +211,12 @@ class Level(object):
             return self.newword.mock2
         elif word_type == 'mock3':
             return self.newword.mock3
+        elif word_type == 'continue':
+            return 'continue'
         else:
             return self.newword.unsure
                    
 root = tk.Tk()
-root.geometry("379x250")
+root.geometry("379x255")
 app = Window(root)
-root.mainloop() 
+root.mainloop()   
