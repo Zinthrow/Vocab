@@ -27,12 +27,16 @@ class Window(tk.Frame):
         file = tk.Menu(menu)
         file.add_command(label = 'Exit', command=self.client_exit)
         menu.add_cascade(label= 'File', menu=file)
-        level = tk.Menu(menu)
-        level.add_command(label = 'Level 1',command= lambda: self.initialize
+        normal = tk.Menu(menu)
+        menu.add_cascade(label= 'Normal', menu= normal)
+        hard = tk.Menu(menu)
+        hard.add_command(label = 'Level 1',command= lambda: self.initialize
                           ("lvl1base.csv"))
-        level.add_command(label = 'level 2',command= lambda: self.initialize
+        hard.add_command(label = 'level 2',command= lambda: self.initialize
                           ("lvl2base.csv"))
-        menu.add_cascade(label= 'Level', menu=level)
+        hard.add_command(label = 'level 3',command= lambda: self.initialize
+                          ("lvl3base.csv"))
+        menu.add_cascade(label= 'Hard', menu=hard)
 
     def client_exit(self):
             root.destroy()
@@ -66,6 +70,14 @@ class Window(tk.Frame):
         notsure = tk.Button(self,text='Not Sure',width = 30, font =
                             ('serif', 15), command=lambda: self.learned(False))
         notsure.grid()
+        
+        complete = tk.Text(self, width=6, height = 1, font= "Helvetica 20")
+        complete.tag_configure("right", justify="center")
+        complete.grid()
+        complete_text = str(len(lvl.done))+str("/"+str(lvl.leng))
+        complete.insert(END, complete_text, "right")
+        complete.config(state=DISABLED)
+        #num_done.config(num_text,justify="right")
         
     def learned(self, option):
         lvl = self.lvl
@@ -109,9 +121,7 @@ class Window(tk.Frame):
     def test(self, lvl):
         lvl.newword = random.SystemRandom().choice(lvl.terms)
         self.populate()
-
         
-            
 class Term(object):
     def __init__(self):
         self.word = None
@@ -177,6 +187,6 @@ class Level(object):
    
        
 root = tk.Tk()
-root.geometry("379x220")
+root.geometry("379x250")
 app = Window(root)
 root.mainloop()   
