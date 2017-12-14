@@ -70,10 +70,13 @@ class Window(tk.Frame):
         notsure = tk.Button(self,text='Not Sure',width = 30, font =
                             ('serif', 15), command=lambda: self.learned(False))
         notsure.grid()
+        self.counter()
         
+    def counter(self):
+        lvl = self.lvl
         complete = tk.Text(self, width=6, height = 1, font= "Helvetica 20")
         complete.tag_configure("right", justify="center")
-        complete.grid()
+        complete.grid(row = 7)
         complete_text = str(len(lvl.done))+str("/"+str(lvl.leng))
         complete.insert(END, complete_text, "right")
         complete.config(state=DISABLED)
@@ -117,6 +120,8 @@ class Window(tk.Frame):
                                 ('bold', 15),command=lambda: self.populate())
             continu.grid()
             lvl.newword = random.SystemRandom().choice(lvl.terms)
+            tk.Label(self, height = 9).grid()
+            self.counter()
             
     def test(self, lvl):
         lvl.newword = random.SystemRandom().choice(lvl.terms)
@@ -183,10 +188,8 @@ class Level(object):
             return self.newword.mock3
         else:
             return self.newword.unsure
-                
-   
-       
+                   
 root = tk.Tk()
 root.geometry("379x250")
 app = Window(root)
-root.mainloop()   
+root.mainloop() 
