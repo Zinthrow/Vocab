@@ -1,2 +1,2 @@
 # Vocab
-A vocabulary building python program utilizing tkinter GUI. One of the first programs I made at the end of summer 2017 before I started taking my classes. The original is labeled vocab.py and is very poorly written. Vocab_remake.py is all around a better written program. Based off a Magoosh made app called 'vocabulary builder'.
+A vocabulary building python program utilizing tkinter GUI. A remake of one of my first project. Vocab_remake.py is all around a better written program. It has two modes, normal and hard, and 5 different sets to choose from among them. Based off a Magoosh made app called 'vocabulary builder'.
