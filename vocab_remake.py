@@ -17,6 +17,7 @@ class Window(tk.Frame):
         self.master = master
         self.grid()
         self.init_window()
+        self.lvl = None
 
     def init_window(self):
         self.master.title("Vocabulary")
@@ -27,24 +28,89 @@ class Window(tk.Frame):
         file.add_command(label = 'Exit', command=self.client_exit)
         menu.add_cascade(label= 'File', menu=file)
         level = tk.Menu(menu)
-        level.add_command(label = 'Level 1',command= lambda: self.initialize("lvl1base.csv"))
-        level.add_command(label = 'level 2',command= lambda: self.initialize("lvl1base.csv"))
+        level.add_command(label = 'Level 1',command= lambda: self.initialize
+                          ("lvl1base.csv"))
+        level.add_command(label = 'level 2',command= lambda: self.initialize
+                          ("lvl2base.csv"))
         menu.add_cascade(label= 'Level', menu=level)
 
     def client_exit(self):
             root.destroy()
     
     def initialize(self, file):
-        x = Level(file = file)
-        x.insert()
-        self.test(x)
-        print (x.terms)
+        lvl = Level(file = file)
+        self.lvl = lvl
+        lvl.insert()
+        self.test(lvl)
         
+    def populate(self):
+        lvl = self.lvl
+        lvl.clear('all')
+        word = tk.Button(self, text=lvl.get_word('word'), width = 35, font =
+                         ('bold', 15), background = "lightcyan")
+        word.grid()
+        definition = tk.Button(self,text=lvl.get_word('definition'),width = 30,
+                               font =('serif', 15),command= lambda: 
+                                   self.learned(True))
+        mock1 = tk.Button(self,text=lvl.get_word('mock1'),width = 30, font =
+                          ('serif', 15), command=lambda: self.learned(False))
+        mock2 = tk.Button(self,text=lvl.get_word('mock2'),width = 30, font =
+                          ('serif', 15), command=lambda: self.learned(False))
+        mock3 = tk.Button(self,text=lvl.get_word('mock3'),width = 30, font =
+                          ('serif', 15), command=lambda: self.learned(False))
+        randbutton = [definition, mock1, mock2, mock3]
+        randbutton = random.sample(randbutton, 4)
+        for butn in randbutton:
+            butn.grid()
+    
+        notsure = tk.Button(self,text='Not Sure',width = 30, font =
+                            ('serif', 15), command=lambda: self.learned(False))
+        notsure.grid()
+        
+    def learned(self, option):
+        lvl = self.lvl
+        lvl.clear('mock')
+        newword = lvl.newword
+        review = lvl.review
+        review2 = lvl.review
+        failed = lvl.failed
+        if option == True:
+            revdef = tk.Button(self,text=lvl.get_word('definition'),width = 30,
+                               font =('serif', 15), background = "lightgreen")
+            revdef.grid()
+            if newword in failed:
+                lvl.failed.remove(newword)
+                lvl.review.append(newword)
+            elif newword in review:
+                lvl.review.remove(newword)
+                lvl.review2.append(newword)
+            elif newword in review2:
+                lvl.review2.remove(newword)
+                lvl.done.append(newword)
+                lvl.terms.remove(newword)
+            else:
+                lvl.done.append(newword)
+                lvl.terms.remove(newword)
+        if option == False:
+            revdef = tk.Button(self,text=lvl.get_word('definition'),width = 30,
+                               font =('serif', 15), background = "pink")
+            revdef.grid()
+            lvl.failed.append(newword)
+            if newword in review:
+                lvl.review.remove(newword)
+            elif newword in review2:
+                lvl.review2.remove(newword)
+        if len(lvl.terms) != 0:    
+            continu = tk.Button(self, text = "Continue", width = 30, font =
+                                ('bold', 15),command=lambda: self.populate())
+            continu.grid()
+            lvl.newword = random.SystemRandom().choice(lvl.terms)
+            
     def test(self, lvl):
         lvl.newword = random.SystemRandom().choice(lvl.terms)
-        while len(lvl.done) != 0:
-            lvl.populate()
-        print ('Done')
+        self.populate()
+
+        
             
 class Term(object):
     def __init__(self):
@@ -82,51 +148,17 @@ class Level(object):
             
     def clear(self, option):
         if option == 'mock':
-            for clrd in app.grid_slaves()[1:]:
+            for clrd in app.grid_slaves()[:-1]:
                 try:
                     clrd.grid_forget()
                 except NameError:
                     continue
-        else:
+        elif option == 'all':
             for clrd in app.grid_slaves():
                 try:
                     clrd.grid_forget()
                 except NameError:
                     continue
-    
-    def learned(self, option):
-        newword = self.newword
-        review = self.review
-        review2 = self.review
-        failed = self.failed
-        if option == True:
-            revdef = tk.Button(self,text=self.get_word('definition'),width = 30, font =('serif', 15), background = "lightgreen")
-            revdef.grid()
-            if newword in failed:
-                self.failed.remove(newword)
-                self.review.append(newword)
-            elif newword in review:
-                self.review.remove(newword)
-                self.review2.append(newword)
-            elif newword in review2:
-                self.review2.remove(newword)
-                self.done.append(newword)
-                self.terms.remove(newword)
-            else:
-                self.done.append(newword)
-                self.terms.remove(newword)
-        if option == False:
-            revdef = tk.Button(self,text=self.get_word('definition'),width = 30, font =('serif', 15), background = "pink")
-            revdef.grid()
-            self.failed.append(newword)
-            if newword in review:
-                self.review.remove(newword)
-            elif newword in review2:
-                self.review2.remove(newword)
-        continu = tk.Button(self, text = "Continue", width = 30, font =('bold', 15), command= self.populate())
-        continu.grid()
-        self.newword = random.SystemRandom().choice(self.terms)
-        
 
     def get_word(self, word_type):
         if word_type == 'word':
@@ -142,29 +174,9 @@ class Level(object):
         else:
             return self.newword.unsure
                 
-    def populate(self):
-        self.clear()
-        word = Button(self, text=self.get_word('word'), width = 35, font =('bold', 15), background = "lightcyan")
-        word.grid()
-        definition = tk.Button(self,text=self.get_word('definition'),width = 30, font =('serif', 15), command=self.learned(True))
-        mock1 = tk.Button(self,text=self.get_word('mock1'),width = 30, font =('serif', 15), command=self.learned(False))
-        mock2 = tk.Button(self,text=self.get_word('mock2'),width = 30, font =('serif', 15), command=self.learned(False))
-        mock3 = tk.Button(self,text=self.get_word('mock3'),width = 30, font =('serif', 15), command=self.learned(False))
-        randbutton = [definition, mock1, mock2, mock3]
-        randbutton = random.sample(randbutton, 4)
-        for butn in randbutton:
-            butn.grid()
-
-        notsure = tk.Button(self,text='Not Sure',width = 30, font =('serif', 15), command=self.learned(False))
-        notsure.grid()
-    '''        
-    def test(self):
-        self.newword = random.SystemRandom().choice(self.terms)
-        while len(self.terms) != 0:
-            self.populate()
-        print ('Done')
-       '''     
+   
+       
 root = tk.Tk()
 root.geometry("379x220")
 app = Window(root)
-root.mainloop()      
+root.mainloop()   
