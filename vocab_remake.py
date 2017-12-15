@@ -86,8 +86,8 @@ class Window(tk.Frame):
         complete.tag_configure("center", justify="center")
         complete.grid(row = 8)
         complete_text = str(len(lvl.done))+str("/"+str(lvl.leng))
-        complete.insert(END, complete_text, "center")
-        complete.config(state=DISABLED)
+        complete.insert(tk.END, complete_text, "center")
+        complete.config(state=tk.DISABLED)
         self.state()
         
     def state(self):
@@ -113,7 +113,7 @@ class Window(tk.Frame):
         review2 = lvl.review
         failed = lvl.failed
         if option == True:
-            revdef=self.buttonmake(lvl.get_word('definition'),'lightgreen',True)
+            revdef=self.buttonmake(lvl.get_word('definition'),'lightgreen',None)
             revdef.grid()
             if newword in failed:
                 lvl.failed.remove(newword)
@@ -129,7 +129,7 @@ class Window(tk.Frame):
                 lvl.done.append(newword)
                 lvl.terms.remove(newword)
         if option == False:
-            revdef = self.buttonmake(lvl.get_word('definition'),'pink',True)
+            revdef = self.buttonmake(lvl.get_word('definition'),'pink',None)
             revdef.grid()
             lvl.failed.append(newword)
             if newword in review:
